@@ -4,7 +4,7 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
-                git branch: 'main', url: 'https://github.com/Sanoj-sudo/collect.git'
+                git branch: 'main', url: 'https://github.com/Sanoj-sudo/redhat-collect.git'
             }
         }
 
