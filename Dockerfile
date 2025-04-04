@@ -45,7 +45,7 @@ RUN curl -LO https://go.dev/dl/go1.23.8.linux-amd64.tar.gz && \
     which gum
 
 # Copy the shell script to be packaged
-COPY my_script.sh /var/jenkins_home/redhat.sh
+COPY redhat.sh /var/jenkins_home/redhat.sh
 RUN chmod +x /var/jenkins_home/redhat.sh
 
 # Ensure Jenkins has proper permissions
