@@ -30,33 +30,33 @@ pipeline {
                 // Create SPEC file
                 sh '''
                 cat <<EOF > rpm_package/SPECS/collect-info.spec
-                Name: collect-info
-                Version: 1.0
-                Release: 1%{?dist}
-                Summary: A script that collects system information using gum UI.
-                License: GPL
-                BuildArch: noarch
+Name: collect-info
+Version: 1.0
+Release: 1%{?dist}
+Summary: A script that collects system information using gum UI.
+License: GPL
+BuildArch: noarch
 
-                %description
-                A script that collects system information using gum UI.
+%description
+A script that collects system information using gum UI.
 
-                %prep
-                %setup -q
+%prep
+%setup -q
 
-                %build
+%build
 
-                %install
-                mkdir -p %{buildroot}/usr/local/bin
-                cp %{_sourcedir}/collect_data.sh %{buildroot}/usr/local/bin/
-                chmod +x %{buildroot}/usr/local/bin/collect_data.sh
+%install
+mkdir -p %{buildroot}/usr/local/bin
+cp %{_sourcedir}/collect_data.sh %{buildroot}/usr/local/bin/
+chmod +x %{buildroot}/usr/local/bin/collect_data.sh
 
-                %files
-                /usr/local/bin/collect_data.sh
+%files
+/usr/local/bin/collect_data.sh
 
-                %changelog
-                * Fri Apr 5 2024 Sanoj <sanojkumar715@email.com> - 1.0-1
-                - Initial RPM release
-                EOF
+%changelog
+* Fri Apr 5 2024 Sanoj <sanojkumar715@email.com> - 1.0-1
+- Initial RPM release
+EOF
                 '''
 
                 // Build RPM package
@@ -68,3 +68,7 @@ pipeline {
         stage('Archive Packages') {
             steps {
                 archiveArtifacts artifacts: 'rpm_package/RPMS/noarch/collect-info-1.0-1.noarch.rpm', fingerprint: true
+            }
+        }
+    }
+}
