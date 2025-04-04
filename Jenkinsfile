@@ -19,15 +19,15 @@ pipeline {
                 sh 'echo "Starting RPM build process..."'
                 sh 'which rpmbuild || echo "rpmbuild not found!"'
 
-                # Create necessary RPM directories
+                // Create necessary RPM directories
                 sh 'mkdir -p rpm_package/{BUILD,RPMS,SOURCES,SPECS,SRPMS}'
                 sh 'mkdir -p rpm_package/usr/local/bin'
 
-                # Copy the script
+                // Copy the script
                 sh 'cp collect_data.sh rpm_package/SOURCES/'
                 sh 'chmod +x rpm_package/SOURCES/collect_data.sh'
 
-                # Create SPEC file
+                // Create SPEC file
                 sh '''
                 cat <<EOF > rpm_package/SPECS/collect-info.spec
                 Name: collect-info
@@ -59,7 +59,7 @@ pipeline {
                 EOF
                 '''
 
-                # Build RPM package
+                // Build RPM package
                 sh 'echo "Running rpmbuild..."'
                 sh 'rpmbuild --define "_topdir $(pwd)/rpm_package" -bb rpm_package/SPECS/collect-info.spec'
             }
@@ -67,8 +67,4 @@ pipeline {
 
         stage('Archive Packages') {
             steps {
-                archiveArtifacts artifacts: 'rpm_package/RPMS/noarch/collect-info-1.0-1.noarch.rpm', fingerprint: true
-            }
-        }
-    }
-}
+                archiveArtifacts artifacts: 'rpm_package/RPMS/noarch/collect-info-1.0-1.noarch.rpm', fingerprint: tru
