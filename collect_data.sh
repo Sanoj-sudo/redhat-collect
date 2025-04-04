@@ -1,5 +1,12 @@
 #!/bin/bash
 
+
+# Check if gum is installed
+if ! command -v gum &> /dev/null; then
+    echo "Error: 'gum' is not installed. Please install gum before running this script."
+    exit 1
+fi
+
 # Ensure gum and sysstat (mpstat) are installed
 if ! command -v mpstat &> /dev/null; then
     sudo apt update && sudo apt install sysstat -y
