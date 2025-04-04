@@ -10,7 +10,6 @@ URL:            https://github.com/Sanoj-sudo/collect.git
 Source0:        %{script_name}.sh
 
 BuildArch:      noarch
-Requires:       sysstat, gum, coreutils, iproute2
 
 %description
 A terminal-based interactive system monitor script using gum and standard Linux utilities.
