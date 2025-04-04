@@ -3,14 +3,15 @@ FROM jenkins/jenkins:lts
 # Switch to root user
 USER root
 
-# Install system dependencies for RPM packaging
-RUN dnf install -y sudo rpm-build rpmdevtools && \
-    dnf clean all
+# Install system dependencies for building RPM and DEB packages
+RUN apt-get update && \
+    apt-get install -y sudo rpm dpkg-dev build-essential fakeroot && \
+    apt-get clean
 
 # Allow Jenkins to use sudo without a password
 RUN echo "jenkins ALL=(ALL) NOPASSWD: ALL" > /etc/sudoers.d/jenkins
 
-# Disable Jenkins setup wizard
+# Disable setup wizard
 ENV JAVA_OPTS="-Djenkins.install.runSetupWizard=false"
 
 # Ensure Jenkins init directory exists
@@ -33,23 +34,12 @@ COPY config.xml /var/jenkins_home/jobs/collect/config.xml
 # Copy pipeline definition
 COPY Jenkinsfile /var/jenkins_home/Jenkinsfile
 
-# Install Go and gum for the script
-RUN curl -LO https://go.dev/dl/go1.23.8.linux-amd64.tar.gz && \
-    tar -C /usr/local -xzf go1.23.8.linux-amd64.tar.gz && \
-    echo 'export PATH=$PATH:/usr/local/go/bin' >> /etc/profile && \
-    source /etc/profile && \
-    go version && \
-    go install github.com/charmbracelet/gum@latest && \
-    echo 'export PATH=$PATH:/usr/local/bin' >> /etc/profile && \
-    source /etc/profile && \
-    which gum
+# Set correct permissions
+RUN chown -R jenkins:jenkins /var/jenkins_home/jobs
 
-# Copy the shell script to be packaged
-COPY redhat.sh /var/jenkins_home/redhat.sh
-RUN chmod +x /var/jenkins_home/redhat.sh
-
-# Ensure Jenkins has proper permissions
-RUN chown -R jenkins:jenkins /var/jenkins_home/jobs /var/jenkins_home/redhat.sh
+# Create RPM build directories (optional)
+RUN mkdir -p /home/jenkins/rpmbuild/{BUILD,RPMS,SOURCES,SPECS,SRPMS} && \
+    chown -R jenkins:jenkins /home/jenkins/rpmbuild
 
 # Switch back to Jenkins user
 USER jenkins
