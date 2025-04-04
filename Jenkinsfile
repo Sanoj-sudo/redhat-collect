@@ -67,4 +67,4 @@ pipeline {
 
         stage('Archive Packages') {
             steps {
-                archiveArtifacts artifacts: 'rpm_package/RPMS/noarch/collect-info-1.0-1.noarch.rpm', fingerprint: tru
+                archiveArtifacts artifacts: 'rpm_package/RPMS/noarch/collect-info-1.0-1.noarch.rpm', fingerprint: true
