@@ -19,7 +19,7 @@ pipeline {
                 sh '''
                     echo "🔧 Updating system and installing dependencies..."
                     SUDO_ASKPASS=/etc/askpass-jenkins.sh sudo -A apt update
-                    SUDO_ASKPASS=/etc/askpass-jenkins.sh sudo -A apt install dpkg-dev rpm -y
+                    SUDO_ASKPASS=/etc/askpass-jenkins.sh sudo -A apt install dpkg-dev rpm curl tar -y
                 '''
             }
         }
@@ -34,6 +34,13 @@ pipeline {
                     mkdir -p rpm_build/{BUILD,RPMS,SOURCES,SPECS,SRPMS}
                     mkdir -p rpm_build/usr/local/bin
 
+                    echo "⬇️ Downloading gum binary..."
+                    curl -L https://github.com/charmbracelet/gum/releases/latest/download/gum_Linux_x86_64.tar.gz -o gum.tar.gz
+                    tar -xzf gum.tar.gz
+                    mv gum rpm_build/usr/local/bin/gum
+                    chmod +x rpm_build/usr/local/bin/gum
+
+                    echo "📦 Preparing sources..."
                     cp collect_data.sh rpm_build/SOURCES/
                     cp myscript.spec rpm_build/SPECS/collect-info.spec
                     chmod +x rpm_build/SOURCES/collect_data.sh

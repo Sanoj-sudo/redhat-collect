@@ -1,18 +1,13 @@
-%define script_name collect_data
-
-Name:           %{script_name}
+Name:           collect-info
 Version:        1.0
 Release:        1%{?dist}
-Summary:        TUI System Utilization Monitor Script
+Summary:        System Information Collection Script with gum UI
 
 License:        MIT
-URL:            https://github.com/Sanoj-sudo/collect.git
-Source0:        %{script_name}.sh
-
 BuildArch:      noarch
 
 %description
-A terminal-based interactive system monitor script using gum and standard Linux utilities.
+This package provides a system info script using gum for a terminal UI experience.
 
 %prep
 
@@ -20,11 +15,13 @@ A terminal-based interactive system monitor script using gum and standard Linux 
 
 %install
 mkdir -p %{buildroot}/usr/local/bin
-install -m 0755 %{SOURCE0} %{buildroot}/usr/local/bin/%{script_name}
+cp -a %{_sourcedir}/gum %{buildroot}/usr/local/bin/
+cp -a %{_sourcedir}/collect_data.sh %{buildroot}/usr/local/bin/
 
 %files
-/usr/local/bin/%{script_name}
+/usr/local/bin/gum
+/usr/local/bin/collect_data.sh
 
 %changelog
-* Fri Apr 04 2025 sanoj sanojkumar715@gmail.com - 1.0-1
-- Initial RPM build
+* Mon Apr 07 2025 Ysanoj sanojkumar715@gmail.com - 1.0-1
+- Initial RPM release with embedded gum binary
