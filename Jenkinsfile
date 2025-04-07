@@ -18,8 +18,8 @@ pipeline {
             steps {
                 sh '''
                     echo "🔧 Updating system and installing dependencies..."
-                    SUDO_ASKPASS=/etc/askpass-jenkins.sh sudo -A apt update -y 
-                    SUDO_ASKPASS=/etc/askpass-jenkins.sh sudo -A apt install dpkg-dev rpm curl tar -y
+                    SUDO_ASKPASS=/etc/askpass-jenkins.sh sudo -A apt update -y # Or yum update -y
+                    SUDO_ASKPASS=/etc/askpass-jenkins.sh sudo -A apt install dpkg-dev rpm curl tar cpio -y # Or yum install ... cpio
                 '''
             }
         }
@@ -40,27 +40,31 @@ pipeline {
 
                     if [ -f "gum.rpm" ]; then
                         echo "✅ Gum RPM downloaded successfully."
+                        FILE_SIZE=$(du -b gum.rpm | awk '{print $1}')
+                        if [ "$FILE_SIZE" -gt 1000 ]; then # Basic size check (adjust as needed)
+                            echo "📦 Downloaded RPM size: ${FILE_SIZE} bytes."
+                            rpm2cpio gum.rpm | cpio -idv ./usr/bin/gum ./usr/local/bin/gum
 
-                        # Extract the gum binary from the RPM (without installing system-wide)
-                        rpm2cpio gum.rpm | cpio -idv ./usr/bin/gum ./usr/local/bin/gum # Check common install paths
+                            if [ -f "./usr/bin/gum" ]; then
+                                mv ./usr/bin/gum rpm_build/usr/local/bin/gum
+                            elif [ -f "./usr/local/bin/gum" ]; then
+                                mv ./usr/local/bin/gum rpm_build/usr/local/bin/gum
+                            else
+                                echo "⚠️ Warning: gum binary not found in expected RPM paths."
+                                exit 1
+                            fi
+                            chmod +x rpm_build/usr/local/bin/gum
 
-                        # Move the extracted binary to the desired location in your build
-                        if [ -f "./usr/bin/gum" ]; then
-                            mv ./usr/bin/gum rpm_build/usr/local/bin/gum
-                        elif [ -f "./usr/local/bin/gum" ]; then
-                            mv ./usr/local/bin/gum rpm_build/usr/local/bin/gum
+                            echo "📦 Preparing sources..."
+                            cp collect_data.sh rpm_build/SOURCES/
+                            cp myscript.spec rpm_build/SPECS/collect-info.spec
+                            chmod +x rpm_build/SOURCES/collect_data.sh
+
+                            rpmbuild --define "_topdir $(pwd)/rpm_build" -bb rpm_build/SPECS/collect-info.spec
                         else
-                            echo "⚠️ Warning: gum binary not found in expected RPM paths."
+                            echo "❌ Error: Downloaded RPM file is too small or empty."
                             exit 1
                         fi
-                        chmod +x rpm_build/usr/local/bin/gum
-
-                        echo "📦 Preparing sources..."
-                        cp collect_data.sh rpm_build/SOURCES/
-                        cp myscript.spec rpm_build/SPECS/collect-info.spec
-                        chmod +x rpm_build/SOURCES/collect_data.sh
-
-                        rpmbuild --define "_topdir $(pwd)/rpm_build" -bb rpm_build/SPECS/collect-info.spec
                     else
                         echo "❌ Error: Failed to download Gum RPM."
                         exit 1
