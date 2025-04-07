@@ -19,7 +19,7 @@ pipeline {
                 sh '''
                     echo "🔧 Updating system and installing dependencies..."
                     SUDO_ASKPASS=/etc/askpass-jenkins.sh sudo -A apt update
-                    SUDO_ASKPASS=/etc/askpass-jenkins.sh sudo -A apt install dpkg-dev rpm curl tar -y
+                    SUDO_ASKPASS=/etc/askpass-jenkins.sh sudo -A apt install dpkg-dev rpm curl tar gzip -y
                 '''
             }
         }
@@ -34,8 +34,17 @@ pipeline {
                     mkdir -p rpm_build/{BUILD,RPMS,SOURCES,SPECS,SRPMS}
                     mkdir -p rpm_build/usr/local/bin
 
-                    echo "⬇️ Downloading gum binary..."
-                    curl -L https://github.com/charmbracelet/gum/releases/latest/download/gum_Linux_x86_64.tar.gz -o gum.tar.gz
+                    GUM_URL="https://github.com/charmbracelet/gum/releases/latest/download/gum_Linux_x86_64.tar.gz" # Store URL in a variable
+                    echo "⬇️ Downloading gum binary from: $GUM_URL"
+                    curl -f -m 30 -sS --retry 3 "$GUM_URL" -o gum.tar.gz
+
+                    file gum.tar.gz # Check the file type
+
+                    if [[ $(file -b --mime-type gum.tar.gz) != "application/gzip" ]]; then
+                      echo "ERROR: Downloaded file is not a gzip archive!"
+                      exit 1
+                    fi
+
                     tar -xzf gum.tar.gz
                     mv gum rpm_build/usr/local/bin/gum
                     chmod +x rpm_build/usr/local/bin/gum

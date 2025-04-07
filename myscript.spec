@@ -15,8 +15,8 @@ This package provides a system info script using gum for a terminal UI experienc
 
 %install
 mkdir -p %{buildroot}/usr/local/bin
-cp -a %{_sourcedir}/gum %{buildroot}/usr/local/bin/
-cp -a %{_sourcedir}/collect_data.sh %{buildroot}/usr/local/bin/
+cp -a %{_topdir}/SOURCES/gum %{buildroot}/usr/local/bin/
+cp -a %{_topdir}/SOURCES/collect_data.sh %{buildroot}/usr/local/bin/
 
 %files
 /usr/local/bin/gum
