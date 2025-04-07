@@ -19,7 +19,7 @@ pipeline {
                 sh '''
                     echo "🔧 Updating system and installing dependencies..."
                     SUDO_ASKPASS=/etc/askpass-jenkins.sh sudo -A apt update
-                    SUDO_ASKPASS=/etc/askpass-jenkins.sh sudo -A apt install dpkg-dev rpm curl tar gzip -y
+                    SUDO_ASKPASS=/etc/askpass-jenkins.sh sudo -A apt install dpkg-dev rpm curl tar gzip file -y
                 '''
             }
         }
